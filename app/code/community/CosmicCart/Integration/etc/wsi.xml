@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:typens="urn:{{var wsdl.name}}" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	name="{{var wsdl.name}}" targetNamespace="urn:{{var wsdl.name}}">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:{{var wsdl.name}}">
+			<xsd:complexType name="salesOrderEntityToCreate">
+				<xsd:sequence>
+					<xsd:element name="orderId" type="xsd:string" minOccurs="1"></xsd:element>
+					<xsd:element name="customer" type="typens:shoppingCartCustomerEntity" minOccurs="1"></xsd:element>
+					<xsd:element name="customer_addresses" type="typens:shoppingCartCustomerAddressEntityArray"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="items" type="typens:salesOrderCreateProductEntityArray"
+						minOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="salesOrderCreateProductEntityArray">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="complexObjectArray"
+						type="typens:salesOrderCreateProductEntity"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="salesOrderCreateProductEntity">
+				<xsd:sequence>
+					<xsd:element name="orderItemId" type="xsd:string" minOccurs="1"/>
+					<xsd:element name="sku" type="xsd:string" minOccurs="1"/>
+					<xsd:element name="qty" type="xsd:double" minOccurs="1"/>
+					<xsd:element name="price" type="xsd:double" minOccurs="1"/>
+                    <xsd:element name="shippingOption" type="xsd:string" minOccurs="1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="salesOrderCreateRequestParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+						<xsd:element minOccurs="1" maxOccurs="1" name="orderData"
+							type="typens:salesOrderEntityToCreate"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="salesOrderCreateResponseParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="result"
+							type="typens:salesOrderCreateResponseStatus"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:complexType name="salesOrderCreateResponseStatus">
+				<xsd:sequence>
+					<xsd:element minOccurs="1" maxOccurs="1" name="orderId" type="xsd:int"/>
+					<xsd:element name="items" type="typens:salesOrderCreateResponseProductArray"
+						minOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="salesOrderCreateResponseProductArray">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="complexObjectArray"
+						type="typens:salesOrderCreateResponseProduct"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="salesOrderCreateResponseProduct">
+				<xsd:sequence>
+					<xsd:element name="sku" type="xsd:string" minOccurs="1"/>
+					<xsd:element name="qtyRequested" type="xsd:double" minOccurs="1"/>
+					<xsd:element name="qtyAllocated" type="xsd:double" minOccurs="1"/>
+					<xsd:element name="qtyBackordered" type="xsd:double" minOccurs="1"/>
+					<xsd:element name="qtyFailed" type="xsd:double" minOccurs="1"/>
+					<xsd:element name="tax" type="xsd:double" minOccurs="1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<!--
+				The existing Magento endpoint for fetching shipping methods and rates is based on an existing cart,
+				but we aren't doing cart sync (yet,) so we need a custom endpoint that allows us to do the same
+				operation based on address.
+			-->
+			<xsd:element name="salesOrderGetShippingMethodsListRequestParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+						<xsd:element minOccurs="1" maxOccurs="1" name="addressData"
+							type="typens:shoppingCartAddressEntity"/>
+                        <xsd:element minOccurs="1" name="orderItemsData"
+                                     type="typens:salesOrderCreateProductEntityArray"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+            <!--
+                Custom request/response for fetching sales tax.
+            -->
+            <xsd:element name="salesOrderGetSalesTaxRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="addressData"
+                                     type="typens:shoppingCartAddressEntity"/>
+                        <xsd:element minOccurs="1" name="orderItemsData"
+                                     type="typens:salesOrderCreateProductEntityArray"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="salesOrderGetSalesTaxResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:float"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!--
+                Custom request/response for fetching shipping cost.
+            -->
+            <xsd:element name="salesOrderGetShippingCostRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="addressData"
+                                     type="typens:shoppingCartAddressEntity"/>
+                        <xsd:element minOccurs="1" name="orderItemsData"
+                                     type="typens:salesOrderCreateProductEntityArray"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="salesOrderGetShippingCostResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:float"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+			<!--
+			    Catalog Products
+			-->
+			<xsd:element name="catalogProductListPageableRequestParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+						<xsd:element minOccurs="1" maxOccurs="1" name="filters" type="typens:filters"/>
+						<xsd:element minOccurs="0" maxOccurs="1" name="store" type="xsd:string"/>
+						<xsd:element minOccurs="0" maxOccurs="1" name="page" type="xsd:int"/>
+						<xsd:element minOccurs="0" maxOccurs="1" name="pageSize" type="xsd:int"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="catalogProductListPageableResponseParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="result"
+							type="typens:catalogProductInventoryReturnEntityArray"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:complexType name="catalogProductInventoryReturnEntityArray">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="complexObjectArray"
+						type="typens:catalogProductInventoryReturnEntity"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="catalogProductInventoryReturnEntity">
+				<xsd:sequence>
+					<xsd:element name="product_id" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="sku" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="set" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="type" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="categories" type="typens:ArrayOfString" minOccurs="0"/>
+					<xsd:element name="websites" type="typens:ArrayOfString" minOccurs="0"/>
+					<xsd:element name="created_at" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="updated_at" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="type_id" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="short_description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="weight" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="status" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="url_key" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="url_path" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="visibility" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="category_ids" type="typens:ArrayOfString" minOccurs="0"/>
+					<xsd:element name="website_ids" type="typens:ArrayOfString" minOccurs="0"/>
+					<xsd:element name="has_options" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="gift_message_available" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="price" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="special_price" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="special_from_date" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="special_to_date" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="tax_class_id" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="tier_price" type="typens:catalogProductTierPriceEntityArray" minOccurs="0"/>
+					<xsd:element name="meta_title" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="meta_keyword" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="meta_description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="custom_design" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="custom_layout_update" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="options_container" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="additional_attributes" type="typens:associativeArray" minOccurs="0"/>
+					<xsd:element name="qty" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="is_in_stock" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="manufacturer" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="parentSku" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="attributes" type="typens:catalogProductConfigurableAttributeArray" minOccurs="0"
+						maxOccurs="1"/>
+					<xsd:element name="images" type="typens:catalogProductImageEntityArray" minOccurs="0"
+						maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="catalogProductConfigurableAttributeArray">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" maxOccurs="unbounded" name="complexObjectArray"
+						type="typens:catalogProductConfigurableAttribute"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="catalogProductConfigurableAttribute">
+				<xsd:sequence>
+					<xsd:element name="attribute" type="xsd:string" minOccurs="1"/>
+					<xsd:element name="value" type="xsd:string" minOccurs="1"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- Fix Magento Bugs -->
+			<xsd:element name="catalogProductAttributeRemoveRequestParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string"/>
+						<xsd:element minOccurs="1" maxOccurs="1" name="attribute" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="catalogProductAttributeRemoveResponseParam">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:boolean"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- END Fix Magento Bugs -->
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="salesOrderCreateRequest">
+		<wsdl:part name="parameters" element="typens:salesOrderCreateRequestParam"/>
+	</wsdl:message>
+	<wsdl:message name="salesOrderCreateResponse">
+		<wsdl:part name="parameters" element="typens:salesOrderCreateResponseParam"/>
+	</wsdl:message>
+	<wsdl:message name="salesOrderGetShippingMethodsListRequest">
+		<wsdl:part name="parameters" element="typens:salesOrderGetShippingMethodsListRequestParam"/>
+	</wsdl:message>
+	<wsdl:message name="salesOrderGetShippingMethodsListResponse">
+		<wsdl:part name="parameters" element="typens:shoppingCartShippingListResponseParam"/>
+	</wsdl:message>
+    <wsdl:message name="salesOrderGetSalesTaxRequest">
+        <wsdl:part name="parameters" element="typens:salesOrderGetSalesTaxRequestParam"/>
+    </wsdl:message>
+    <wsdl:message name="salesOrderGetSalesTaxResponse">
+        <wsdl:part name="parameters" element="typens:salesOrderGetSalesTaxResponseParam"/>
+    </wsdl:message>
+    <wsdl:message name="salesOrderGetShippingCostRequest">
+        <wsdl:part name="parameters" element="typens:salesOrderGetShippingCostRequestParam"/>
+    </wsdl:message>
+    <wsdl:message name="salesOrderGetShippingCostResponse">
+        <wsdl:part name="parameters" element="typens:salesOrderGetShippingCostResponseParam"/>
+    </wsdl:message>
+	<wsdl:message name="catalogProductListPageableRequest">
+		<wsdl:part name="parameters" element="typens:catalogProductListPageableRequestParam"/>
+	</wsdl:message>
+	<wsdl:message name="catalogProductListPageableResponse">
+		<wsdl:part name="parameters" element="typens:catalogProductListPageableResponseParam"/>
+	</wsdl:message>
+	<!--Fix Magento Bugs -->
+	<wsdl:message name="catalogProductAttributeRemoveRequest">
+		<wsdl:part name="parameters" element="typens:catalogProductAttributeRemoveRequestParam"/>
+	</wsdl:message>
+	<wsdl:message name="catalogProductAttributeRemoveResponse">
+		<wsdl:part name="parameters" element="typens:catalogProductAttributeRemoveResponseParam"/>
+	</wsdl:message>
+	<!-- END Fix Magento Bugs -->
+	<wsdl:portType name="{{var wsdl.handler}}PortType">
+		<wsdl:operation name="salesOrderCreate">
+			<wsdl:documentation>Create sales order</wsdl:documentation>
+			<wsdl:input message="typens:salesOrderCreateRequest"/>
+			<wsdl:output message="typens:salesOrderCreateResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="salesOrderGetShippingMethodsList">
+			<wsdl:documentation>Create sales order</wsdl:documentation>
+			<wsdl:input message="typens:salesOrderGetShippingMethodsListRequest"/>
+			<wsdl:output message="typens:salesOrderGetShippingMethodsListResponse"/>
+		</wsdl:operation>
+        <wsdl:operation name="salesOrderGetSalesTax">
+            <wsdl:documentation>Create sales order</wsdl:documentation>
+            <wsdl:input message="typens:salesOrderGetSalesTaxRequest"/>
+            <wsdl:output message="typens:salesOrderGetSalesTaxResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="salesOrderGetShippingCost">
+            <wsdl:documentation>Create sales order</wsdl:documentation>
+            <wsdl:input message="typens:salesOrderGetShippingCostRequest"/>
+            <wsdl:output message="typens:salesOrderGetShippingCostResponse"/>
+        </wsdl:operation>
+		<wsdl:operation name="catalogProductListPageable">
+			<wsdl:documentation>Retrive pageable products list by filters</wsdl:documentation>
+			<wsdl:input message="typens:catalogProductListPageableRequest"/>
+			<wsdl:output message="typens:catalogProductListPageableResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="{{var wsdl.handler}}Binding" type="typens:{{var wsdl.handler}}PortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="salesOrderCreate">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="salesOrderGetShippingMethodsList">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+        <wsdl:operation name="salesOrderGetSalesTax">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="salesOrderGetShippingCost">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+		<wsdl:operation name="catalogProductListPageable">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!-- Fix Magento Bugs -->
+		<wsdl:operation name="catalogProductAttributeRemove">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!-- END Fix Magento Bugs -->
+	</wsdl:binding>
+</wsdl:definitions>

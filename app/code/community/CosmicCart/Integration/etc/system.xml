@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<sections>
+		<payment>
+			<groups>
+				<cosmiccart translate="label" module="integration">
+					<label>Cosmic Cart Payment</label>
+					<sort_order>670</sort_order>
+					<show_in_default>0</show_in_default>
+					<show_in_website>0</show_in_website>
+					<show_in_store>0</show_in_store>
+				</cosmiccart>
+			</groups>
+		</payment>
+	</sections>
+</config>

@@ -1,0 +1,42 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('activation.title')?></h3></td>
+            <td class="a-right">
+                <button onclick="editForm.submit()" class="scalable save" type="button"><span><?=$this->__('activation.submit')?></span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <? if ($this->getData('activated')) { ?>
+        <div style="color:#009900;font-size:16px;margin-bottom:10px"><?=$this->__('activation.complete')?></div>
+    <? } ?>
+    <form id="edit_form" name="edit_form" method="post" action="<?=$this->getUrl('*/*/post')?>">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('activation.api.title')?></h4>
+        <fieldset id="my-fieldset">
+            <table cellspacing="0" class="form-list">
+                <tr>
+                    <td class="label"><?=$this->__('activation.api.client')?> <span class="required">*</span></td>
+                    <td class="input-ele"><input type="text" class="input-text required-entry" name="clientId" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?=$this->__('activation.api.secret')?> <span class="required">*</span></td>
+                    <td class="input-ele"><input type="text" class="input-text required-entry" name="clientSecret" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?=$this->__('activation.api.username')?> <span class="required">*</span></td>
+                    <td class="input-ele"><input type="text" class="input-text required-entry" name="username" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><?=$this->__('activation.api.password')?> <span class="required">*</span></td>
+                    <td class="input-ele"><input type="password" class="input-text required-entry" name="password" /></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>

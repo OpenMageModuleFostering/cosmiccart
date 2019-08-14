@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config>
+	<api>
+		<resources>
+			<sales_order translate="title" module="sales">
+				<title>Create Order API</title>
+				<model>CosmicCart_Integration_Model_Order_Api</model>
+				<acl>sales/order</acl>
+				<methods>
+					<create translate="title" module="sales">
+						<title>Create Order</title>
+						<acl>sales/order/create</acl>
+					</create>
+					<getShippingMethodsList translate="title" module="sales">
+						<title>Get Shipping Methods List</title>
+						<acl>sales/order/getShippingMethodsList</acl>
+					</getShippingMethodsList>
+                    <getSalesTax translate="title" module="sales">
+                        <title>Get Sales Tax</title>
+                        <acl>sales/order/getSalesTax</acl>
+                    </getSalesTax>>
+                    <getShippingCost translate="title" module="sales">
+                        <title>Get Shipping Cost</title>
+                        <acl>sales/order/getShippingCost</acl>
+                    </getShippingCost>>
+				</methods>
+			</sales_order>
+			<catalog_product translate="title" module="catalog">
+				<title>Catalog Product API</title>
+				<model>CosmicCart_Integration_Model_Product_Api</model>
+				<acl>catalog/product</acl>
+				<methods>
+					<listPageable translate="title" module="catalog">
+						<title>Retrieve pageable product list by features</title>
+						<acl>catalog/product/info</acl>
+					</listPageable>
+				</methods>
+			</catalog_product>
+		</resources>
+	</api>
+</config>
